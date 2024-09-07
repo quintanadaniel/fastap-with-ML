@@ -1,0 +1,43 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - master
+
+
+jobs:
+  checkout_mycode:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: check out
+        id: check
+        run: |
+          echo "checking out the code"
+
+  deploy_to_dev:
+    needs: checkout_mycode
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
+      url: http://noble-mutuwa.com/
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+
+      - name: Copy files to EC2
+        run: scp -r -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "${{ github.workspace }}" ${{secret.USERNAME}}@${{secret.HOSTNAME}}:~/website/
+
+      - name: SSH into EC2
+        run: | 
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{secret.USERNAME}}@${{secret.HOSTNAME}} "sudo cp -r ~/website/mywebsite/* /var/www/html/"
