@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image-detector
+  labels:
+    app: image-detector
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: image-detector
+  template:
+    metadata:
+      name: image-detector
+      labels:
+        app: image-detector
+    spec:
+      containers:
+        - name: image-detector
+          image: image-detector:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always
+      

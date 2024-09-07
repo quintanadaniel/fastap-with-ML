@@ -1,0 +1,9 @@
+transformers
+requests
+black
+fastapi
+uvicorn
+pillow
+jupyter
+torch
+python-multipart
