@@ -50,12 +50,12 @@ jobs:
 
       - name: Test SSH connection
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo Connected successfully"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOSTNAME }} "echo Connected successfully"
 
       # Step 8: Copy the Docker image to EC2 instance using SCP
       - name: Copy Docker image to EC2
         run: |
-          docker save ${{ secrets.DOCKER_IMAGE_NAME }} | bzip2 | ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bunzip2 | docker load"
+          docker save ${{ secrets.DOCKER_IMAGE_NAME }} | bzip2 | ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOSTNAME }} "bunzip2 | docker load"
 
       # Step 9: Deploy the Docker container on EC2
       - name: Deploy on EC2
