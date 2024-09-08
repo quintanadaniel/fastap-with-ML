@@ -20,9 +20,7 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
         run: |
-          echo "EC2_HOST: ${{ env.HOSTNAME }}"
-          echo "EC2_USER: ${{ env.USERNAME }}"
-          echo "DOCKER_IMAGE_NAME: ${{ env.DOCKER_IMAGE_NAME }}"
+          echo "EC2_USER: $USERNAME"
 
       - name: Print environment variables
         run: printenv
