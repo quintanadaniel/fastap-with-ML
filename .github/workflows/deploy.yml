@@ -5,6 +5,12 @@ on:
     branches:
       - master
 
+
+env:
+  HOSTNAME: ${{ secrets.HOSTNAME }}
+  USERNAME: ${{ secrets.USERNAME }}
+  DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -12,59 +18,10 @@ jobs:
     steps:
       - name: Print environment values
         run: |
-          echo "EC2_HOST: ${{ secrets.HOSTNAME }}"
-          echo "EC2_USER: ${{ secrets.USERNAME }}"
-          echo "DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}"
+          echo "EC2_HOST: ${{ env.HOSTNAME }}"
+          echo "EC2_USER: ${{ env.USERNAME }}"
+          echo "DOCKER_IMAGE_NAME: ${{ env.DOCKER_IMAGE_NAME }}"
 
       - name: Print environment variables
         run: printenv
 
-      # Step 1: Checkout the latest code
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Step 2: Set up Python environment
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      # Step 3: Install dependencies, including black
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      # Step 4: Run black to check code formatting
-      - name: Run black (Python code formatter)
-        run: |
-          black --check .
-
-      # Step 5: Set up Docker
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      # Step 6: Build the Docker image
-      - name: Build the Docker image
-        run: |
-          docker build --progress=plain -t ${{ secrets.DOCKER_IMAGE_NAME }} .
-
-      # Step 7: Add SSH key
-      - name: Add SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SECRET_ACCESS_KEY }}
-
-      # Step 8: Copy the Docker image to EC2 instance using SCP
-      - name: Copy Docker image to EC2
-        run: |
-          docker save ${{ secrets.DOCKER_IMAGE_NAME }} | bzip2 | ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bunzip2 | docker load"
-
-      # Step 9: Deploy the Docker container on EC2
-      - name: Deploy on EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOSTNAME }} << 'EOF'
-            docker stop fastapi_container || true
-            docker rm fastapi_container || true
-            docker run -d --name fastapi_container -p 80:80 ${{ secrets.DOCKER_IMAGE_NAME }}
-          EOF
