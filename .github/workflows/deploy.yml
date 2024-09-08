@@ -10,6 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Print environment values
+        run: |
+          echo "EC2_HOST: ${{ secrets.EC2_HOST }}"
+          echo "EC2_USER: ${{ secrets.EC2_USER }}"
+          echo "DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}"
+
       # Step 1: Checkout the latest code
       - name: Checkout code
         uses: actions/checkout@v3
@@ -38,7 +44,7 @@ jobs:
       # Step 6: Build the Docker image
       - name: Build the Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_IMAGE_NAME }} .
+          docker build --progress=plain -t ${{ secrets.DOCKER_IMAGE_NAME }} .
 
       # Step 7: Add SSH key
       - name: Add SSH key
