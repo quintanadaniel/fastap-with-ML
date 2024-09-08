@@ -6,11 +6,6 @@ on:
       - master
 
 
-env:
-  HOSTNAME: ${{ secrets.HOSTNAME }}
-  USERNAME: ${{ secrets.USERNAME }}
-  DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -20,6 +15,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Print environment values
+        env:
+          HOSTNAME: ${{ secrets.HOSTNAME }}
+          USERNAME: ${{ secrets.USERNAME }}
+          DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
         run: |
           echo "EC2_HOST: ${{ env.HOSTNAME }}"
           echo "EC2_USER: ${{ env.USERNAME }}"
