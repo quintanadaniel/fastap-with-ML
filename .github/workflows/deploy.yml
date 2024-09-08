@@ -73,11 +73,11 @@ jobs:
           docker pull ${{ secrets.ECR_REPOSITORY }}:latest
 
           # Stop and remove the old container if it exists
-          docker stop my-fastapi-app || true
-          docker rm my-fastapi-app || true
+          docker stop $(docker ps -q) || true
+          docker rm $(docker ps -a -q) || true
 
           # Run the new Docker container
-          docker run -d --name my-fastapi-app -p 80:80 ${{ secrets.ECR_REPOSITORY }}:latest
+          docker run -d --name fastapi-app -p 80:80 ${{ secrets.ECR_REPOSITORY }}:latest
           EOF
 
       - name: Test deployed app
