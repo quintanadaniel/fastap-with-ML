@@ -8,6 +8,7 @@ on:
 
 jobs:
   deploy:
+    environment: dev
     runs-on: ubuntu-latest
 
     steps:
@@ -16,9 +17,9 @@ jobs:
 
       - name: Print environment values
         env:
-          HOSTNAME: ${{ secrets.dev.HOSTNAME }}
-          USERNAME: ${{ secrets.dev.USERNAME }}
-          DOCKER_IMAGE_NAME: ${{ secrets.dev.DOCKER_IMAGE_NAME }}
+          HOSTNAME: ${{ secrets.HOSTNAME }}
+          USERNAME: ${{ secrets.USERNAME }}
+          DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
           PRUEBA: "Thi is a test"
         run: |
           echo "EC2_USER: $USERNAME"
