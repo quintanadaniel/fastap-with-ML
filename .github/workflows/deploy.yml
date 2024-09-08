@@ -19,8 +19,11 @@ jobs:
           HOSTNAME: ${{ secrets.HOSTNAME }}
           USERNAME: ${{ secrets.USERNAME }}
           DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
+          PRUEBA: "Thi is a test"
         run: |
           echo "EC2_USER: $USERNAME"
+          echo $PRUEBA
+          echo ${{ env.PRUEBA }}
 
       - name: Print environment variables
         run: printenv
