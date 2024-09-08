@@ -47,11 +47,17 @@ jobs:
           echo "${{ secrets.SECRET_ACCESS_KEY }}" > key.pem
           cat key.pem
 
+      - name: Check ssh-agent status
+        run: |
+          eval $(ssh-agent -s)
+          ssh-add -l
+
       # Step 7: Add SSH key
       - name: Add SSH key
         run: |
           echo "${{ secrets.SECRET_ACCESS_KEY }}" > key.pem
           chmod 400 key.pem
+          eval $(ssh-agent -s)
           ssh-add key.pem
 
       - name: Test SSH connection
