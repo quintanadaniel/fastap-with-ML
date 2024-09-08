@@ -42,23 +42,11 @@ jobs:
         run: |
           docker build --progress=plain -t ${{ secrets.DOCKER_IMAGE_NAME }} .
 
-      - name: Check SSH private key format
-        run: |
-          echo "${{ secrets.SECRET_ACCESS_KEY }}" > key.pem
-          cat key.pem
-
-      - name: Check ssh-agent status
-        run: |
-          eval $(ssh-agent -s)
-          ssh-add -l
-
       # Step 7: Add SSH key
-      - name: Add SSH key
-        run: |
-          echo "${{ secrets.SECRET_ACCESS_KEY }}" > key.pem
-          chmod 400 key.pem
-          eval $(ssh-agent -s)
-          ssh-add key.pem
+      - name: Start ssh-agent and add SSH key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Test SSH connection
         run: |
