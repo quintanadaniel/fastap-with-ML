@@ -58,19 +58,22 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOSTNAME }} << 'EOF'
-            # Log in to AWS ECR
-            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
-            docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
+          
+          sudo apt-get update -y
+          
+          # Log in to AWS ECR
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
+          docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
 
-            # Pull the latest Docker image
-            docker pull ${{ secrets.ECR_REPOSITORY }}:latest
+          # Pull the latest Docker image
+          docker pull ${{ secrets.ECR_REPOSITORY }}:latest
 
-            # Stop and remove the old container if it exists
-            docker stop my-fastapi-app || true
-            docker rm my-fastapi-app || true
+          # Stop and remove the old container if it exists
+          docker stop my-fastapi-app || true
+          docker rm my-fastapi-app || true
 
-            # Run the new Docker container
-            docker run -d --name my-fastapi-app -p 80:80 ${{ secrets.ECR_REPOSITORY }}:latest
+          # Run the new Docker container
+          docker run -d --name my-fastapi-app -p 80:80 ${{ secrets.ECR_REPOSITORY }}:latest
           EOF
 
       - name: Test deployed app
