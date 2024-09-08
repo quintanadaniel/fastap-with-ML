@@ -12,9 +12,12 @@ jobs:
     steps:
       - name: Print environment values
         run: |
-          echo "EC2_HOST: ${{ secrets.EC2_HOST }}"
-          echo "EC2_USER: ${{ secrets.EC2_USER }}"
+          echo "EC2_HOST: ${{ secrets.HOSTNAME }}"
+          echo "EC2_USER: ${{ secrets.USERNAME }}"
           echo "DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}"
+
+      - name: Print environment variables
+        run: printenv
 
       # Step 1: Checkout the latest code
       - name: Checkout code
