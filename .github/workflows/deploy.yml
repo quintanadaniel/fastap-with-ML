@@ -43,7 +43,7 @@ jobs:
 
       - name: Build and push Docker image to ECR
         run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY }}:latest .
+          docker buildx build --platform linux/arm64 -t ${{ secrets.ECR_REPOSITORY }}:latest .
           docker push ${{ secrets.ECR_REPOSITORY }}:latest
 
       - name: Start ssh-agent and add SSH key
