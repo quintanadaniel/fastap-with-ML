@@ -44,10 +44,10 @@ jobs:
       - name: Build and push Docker image to ECR
         run: |
           docker buildx create --use
-          docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.ECR_REPOSITORY }}:latest --push .
+          #docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.ECR_REPOSITORY }}:latest --push .
           
-          #docker buildx build --platform linux/arm64 -t ${{ secrets.ECR_REPOSITORY }}:latest .
-          #docker push ${{ secrets.ECR_REPOSITORY }}:latest
+          docker buildx build --platform linux/arm64 -t ${{ secrets.ECR_REPOSITORY }}:latest .
+          docker push ${{ secrets.ECR_REPOSITORY }}:latest
 
       - name: Start ssh-agent and add SSH key
         uses: webfactory/ssh-agent@v0.5.3
@@ -80,7 +80,7 @@ jobs:
           docker rm $(docker ps -a -q) || true
 
           # Run the new Docker container
-          docker run -d --name fastapi-app -p 80:80 ${{ secrets.ECR_REPOSITORY }}:latest
+          docker run -d --name fastapi-app -p 80:8000 ${{ secrets.ECR_REPOSITORY }}:latest
           EOF
 
       - name: Test deployed app
