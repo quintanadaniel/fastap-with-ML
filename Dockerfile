@@ -20,6 +20,7 @@ WORKDIR /app
 # into this layer.
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    python -m pip install --upgrade pip \
     python -m pip install -r requirements.txt
 
 # Copy the source code into the container.

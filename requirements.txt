@@ -4,6 +4,6 @@ black==24.8.0
 fastapi==0.114.0
 uvicorn==0.30.6
 pillow==10.4.0
-jupyter==1.1.1
+#jupyter==1.1.1
 torch==2.4.1
 python-multipart==0.0.9
