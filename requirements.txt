@@ -7,3 +7,6 @@ pillow
 #jupyter==1.1.1
 torch
 python-multipart
+datadog
+ddtrace
+python-dotenv
