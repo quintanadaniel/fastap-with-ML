@@ -13,10 +13,7 @@ class DatadogClient:
         self.app_key = os.getenv("APP_KEY")
 
     def client_initialize(self):
-        options = {
-            "api_key": self.api_key,
-            "app_key": self.app_key
-        }
+        options = {"api_key": self.api_key, "app_key": self.app_key}
         return initialize(**options)
 
     def send_metrics_incremental(self, name: str):
