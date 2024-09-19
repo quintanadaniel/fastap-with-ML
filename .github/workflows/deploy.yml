@@ -1,10 +1,9 @@
-name: Deploy to EC2
+name: Build and push ECR image
 
 on:
   push:
     branches:
       - master
-
 
 jobs:
   deploy:
@@ -45,43 +44,52 @@ jobs:
         run: |
           docker build -t ${{ secrets.ECR_REPOSITORY }}:latest .
           docker push ${{ secrets.ECR_REPOSITORY }}:latest
+          echo "IMAGE_URL=${{ secrets.ECR_REPOSITORY }}:latest" >> $GITHUB_ENV
 
-      - name: Start ssh-agent and add SSH key
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SECRET_ACCESS_KEY }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
 
-      - name: Test SSH connection
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        if: success()
+        env:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+        run: terraform apply -auto-approve
+
+      - name: Get Terraform Outputs
+        id: outputs
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOSTNAME }} "echo Connected successfully"
+          echo "Cluster Name=$(terraform output -raw cluster_name)" >> $GITHUB_ENV
 
-      - name: Deploy to EC2
+      - name: Install kubectl
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOSTNAME }} << 'EOF'
-          
-          sudo apt-get update -y
-          
-          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}
-          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          export AWS_REGION=${{ secrets.AWS_REGION }}
-          
-          # Log in to AWS ECR
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
-          docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
+          curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
 
-          # Pull the latest Docker image
-          docker pull ${{ secrets.ECR_REPOSITORY }}:latest
+      - name: Configure kubectl
+        run: aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ env.Cluster_Name }}
+        env:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-          # Stop and remove the old container if it exists
-          docker stop $(docker ps -q) || true
-          docker rm $(docker ps -a -q) || true
+      - name: Apply Kubernetes Manifests
+        run: kubectl apply -f k8s/
 
-          # Run the new Docker container
-          docker run -d --name fastapi-app -p 80:8000 ${{ secrets.ECR_REPOSITORY }}:latest
-          EOF
+      - name: Set Image in Kubernetes Deployment
+        run: kubectl set image deployment/image-detector-deployment image-detector=${{ env.IMAGE_URL }}
 
-      - name: Test deployed app
+      - name: Wait for EKS Cluster to be Ready
         run: |
-          curl -f http://${{secrets.HOSTNAME}}/ || exit 1
-
-
+          until kubectl get nodes; do
+            echo "Waiting for nodes to become ready..."
+            sleep 20
+          done
