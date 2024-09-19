@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: image-detector
+  name: image-detector-deployment
   labels:
     app: image-detector
 spec:
@@ -17,10 +17,9 @@ spec:
     spec:
       containers:
         - name: image-detector
-          image: image-detector:latest
-          imagePullPolicy: Never
+          image: "{{IMAGE_URL}}"
           ports:
-            - containerPort: 8080
+            - containerPort: 80
               protocol: TCP
       restartPolicy: Always
       
