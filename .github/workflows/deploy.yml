@@ -51,13 +51,16 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Init
+        working-directory: ./terraform
         run: terraform init
 
       - name: Terraform Plan
+        working-directory: ./terraform
         run: terraform plan
 
       - name: Terraform Apply
         if: success()
+        working-directory: ./terraform
         env:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
