@@ -2,17 +2,17 @@ provider "aws" {
   region = "eu-north-1"
 }
 
-resource "aws_eks_cluster" "cluster-im-det" {
-  name     = "cluster-im-det"
+resource "aws_eks_cluster" "cluster_img_det" {
+  name     = "cluster_im_det"
   role_arn = "arn:aws:iam::262520292671:role/kube_role"
   vpc_config {
     subnet_ids = ["subnet-04b246e72d57e052c", "subnet-0341e161613eed3f0"]
   }
 }
 
-resource "aws_eks_node_group" "image-detector-node-group" {
-  cluster_name    = "aws_eks_cluster.cluster-im-det.cluster-im-det"
-  node_group_name = "image-detector-node-group"
+resource "aws_eks_node_group" "imagen_detector_ng" {
+  cluster_name    = "aws_eks_cluster.cluster_img_det.cluster_im_det"
+  node_group_name = "imagen_detector_node_group"
   node_role_arn   = "arn:aws:iam::262520292671:role/kube_role"
   subnet_ids      = ["subnet-04b246e72d57e052c", "subnet-0341e161613eed3f0"]
 
