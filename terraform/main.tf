@@ -11,7 +11,7 @@ resource "aws_eks_cluster" "cluster_img_det" {
 }
 
 resource "aws_eks_node_group" "imagen_detector_ng" {
-  cluster_name    = "aws_eks_cluster.cluster_img_det.cluster_im_det"
+  cluster_name    = aws_eks_cluster.cluster_img_det.cluster_im_det
   node_group_name = "imagen_detector_node_group"
   node_role_arn   = "arn:aws:iam::262520292671:role/kube_role"
   subnet_ids      = ["subnet-04b246e72d57e052c", "subnet-0341e161613eed3f0"]
