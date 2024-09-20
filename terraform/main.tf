@@ -3,7 +3,10 @@ provider "aws" {
 }
 
 data "aws_subnet_ids" "eks_subnets" {
-  vpc_id = "vpc-05d27574bcd23daaf"
+  filter {
+    name   = "vpc-id"
+    values = ["vpc-05d27574bcd23daaf"]
+  }
 }
 
 resource "aws_eks_cluster" "cluster_img_det" {
